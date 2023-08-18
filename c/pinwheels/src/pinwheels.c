@@ -16,7 +16,7 @@ static const short RULES[3][17] = {
     {-1, -1,  1,  1,  1, -1, 0, 0, 0, 0, 0, 1,  1,  1, -1, 1, 1}
 };
 
-static const char *COLORS[3] = {
+static char *COLORS[3] = {
     "113 170 197",
     "016 032 041",
     "201 100 126"
@@ -102,7 +102,9 @@ pinwheels(unsigned width, unsigned height, unsigned iter)
 
         for (unsigned i = 0; i < height; ++i)
             for (unsigned j = 0; j < width; ++j) {
-                puts(COLORS[uni[i][j][flag] + 1]);
+                if (n == (iter - 1)) {
+                    puts(COLORS[uni[i][j][flag] + 1]);
+                }
 
                 cnt = 0;
 
@@ -135,6 +137,10 @@ main(int argc, char **argv)
     unsigned width  = 500;
     unsigned height = 500;
     unsigned iter   = 500;
+
+    COLORS[0] = getenv("COLOR0");
+    COLORS[1] = getenv("COLOR1");
+    COLORS[2] = getenv("COLOR2");
 
     for (int arg; (arg = getopt(argc, argv, ":w:h:i:")) != -1;)
         switch (arg) {

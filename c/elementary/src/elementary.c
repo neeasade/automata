@@ -54,7 +54,8 @@ elementary(unsigned short rule, const char *strip)
     /* start parsing strip */
     size_t length;
 
-    length = strnlen(strip, LINE_MAX);
+    /* length = strnlen(strip, LINE_MAX); */
+    length = strnlen(strip, 3840);
 
     /* init array */
     bool **uni;
