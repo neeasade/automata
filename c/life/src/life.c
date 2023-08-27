@@ -88,7 +88,9 @@ life(unsigned width, unsigned height, unsigned iter)
 
         for (unsigned i = 0; i < height; ++i)
             for (unsigned j = 0; j < width; ++j) {
+                if (n == (iter - 1)) {
                 putchar(uni[i][j][flag] + '0');
+                }
 
                 cnt = 0;
 
