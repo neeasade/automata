@@ -54,8 +54,14 @@ elementary(unsigned short rule, const char *strip)
     /* start parsing strip */
     size_t length;
 
+
     /* length = strnlen(strip, LINE_MAX); */
-    length = strnlen(strip, 3840);
+
+    /* getconf ARG_MAX */
+    /* 2505728 */
+
+    /* 2x 4k */
+    length = strnlen(strip, 7680);
 
     /* init array */
     bool **uni;
@@ -80,11 +86,41 @@ elementary(unsigned short rule, const char *strip)
     /* run elementary automaton */
     unsigned short cnt;
 
-    printf("P1\n%lu %lu\n", length, length);
+    size_t skip = 300;
+    printf("P6\n%lu %lu\n255\n", length, length - skip);
+
+    int r, g, b;
+    int r1, g1, b1;
+
+    unsigned char rgb[3];
+    unsigned char rgb1[3];
+
+    /* COLORS[0] = getenv("COLOR0"); */
+    /* COLORS[1] = getenv("COLOR1"); */
+
+    sscanf(getenv("COLOR0"), "%d %d %d", &r, &g, &b);
+    rgb[0] = (unsigned char)r;
+    rgb[1] = (unsigned char)g;
+    rgb[2] = (unsigned char)b;
+
+    sscanf(getenv("COLOR1"), "%d %d %d", &r1, &g1, &b1);
+    rgb1[0] = (unsigned char)r1;
+    rgb1[1] = (unsigned char)g1;
+    rgb1[2] = (unsigned char)b1;
 
     for (size_t i = 0; i < length; ++i) {
         for (size_t j = 0; j < length; ++j) {
-            putchar(uni[j][flag] + '0');
+            if (i >= skip) {
+                if (uni[j][flag] == 0) {
+                    fwrite(rgb, sizeof(unsigned char), 3, stdout);
+                    /* putchar('0'); */
+                } else {
+                    fwrite(rgb1, sizeof(unsigned char), 3, stdout);
+                    /* putchar('1'); */
+                }
+            }
+
+            /* putchar(uni[j][flag] + '0'); */
 
             cnt = 0;
 
@@ -111,6 +147,8 @@ main(int argc, char **argv)
         usage(argv[0]);
 
     elementary(get_rule(argv[1]), argv[2]);
+
+    fflush(stdout);
 
     return 0;
 }
