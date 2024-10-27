@@ -7,6 +7,12 @@
 #include <time.h>
 #include <unistd.h>
 
+static char *COLORS[3] = {
+    "237 238 240",
+    "113 170 197",
+    "016 032 041"
+};
+
 /*
  * helper functions
  */
@@ -84,12 +90,14 @@ life(unsigned width, unsigned height, unsigned iter)
     unsigned short cnt = 0;
 
     for (unsigned n = 0; n < iter; ++n) {
-        printf("P1\n%u %u\n", width, height);
+        printf("P3\n%u %u\n255\n", width, height);
 
         for (unsigned i = 0; i < height; ++i)
             for (unsigned j = 0; j < width; ++j) {
                 if (n == (iter - 1)) {
-                putchar(uni[i][j][flag] + '0');
+                    puts(COLORS[uni[i][j][flag]]);
+                    /* puts(COLORS[0]); */
+                    /* putchar(uni[i][j][flag] + '0'); */
                 }
 
                 cnt = 0;
@@ -129,6 +137,10 @@ main(int argc, char **argv)
     unsigned width  = 500;
     unsigned height = 500;
     unsigned iter   = 500;
+
+    COLORS[0] = getenv("COLOR0");
+    COLORS[1] = getenv("COLOR1");
+    COLORS[2] = getenv("COLOR2");
 
     for (int arg; (arg = getopt(argc, argv, ":w:h:i:")) != -1;)
         switch (arg) {

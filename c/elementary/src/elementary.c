@@ -45,6 +45,18 @@ allocate(size_t size)
     return ptr;
 }
 
+unsigned char* read_color(const char* name) {
+    unsigned char *rgb = malloc(3);
+
+    int r, g, b;
+    sscanf(getenv(name), "%d %d %d", &r, &g, &b);
+
+    rgb[0] = (unsigned char)r;
+    rgb[1] = (unsigned char)g;
+    rgb[2] = (unsigned char)b;
+    return rgb;
+}
+
 /*
  * main function
  */
@@ -89,33 +101,17 @@ elementary(unsigned short rule, const char *strip)
     size_t skip = 300;
     printf("P6\n%lu %lu\n255\n", length, length - skip);
 
-    int r, g, b;
-    int r1, g1, b1;
-
-    unsigned char rgb[3];
-    unsigned char rgb1[3];
-
-    /* COLORS[0] = getenv("COLOR0"); */
-    /* COLORS[1] = getenv("COLOR1"); */
-
-    sscanf(getenv("COLOR0"), "%d %d %d", &r, &g, &b);
-    rgb[0] = (unsigned char)r;
-    rgb[1] = (unsigned char)g;
-    rgb[2] = (unsigned char)b;
-
-    sscanf(getenv("COLOR1"), "%d %d %d", &r1, &g1, &b1);
-    rgb1[0] = (unsigned char)r1;
-    rgb1[1] = (unsigned char)g1;
-    rgb1[2] = (unsigned char)b1;
+    unsigned char* color0 = read_color("COLOR0");
+    unsigned char* color1 = read_color("COLOR1");
 
     for (size_t i = 0; i < length; ++i) {
         for (size_t j = 0; j < length; ++j) {
             if (i >= skip) {
                 if (uni[j][flag] == 0) {
-                    fwrite(rgb, sizeof(unsigned char), 3, stdout);
+                    fwrite(color0, sizeof(unsigned char), 3, stdout);
                     /* putchar('0'); */
                 } else {
-                    fwrite(rgb1, sizeof(unsigned char), 3, stdout);
+                    fwrite(color1, sizeof(unsigned char), 3, stdout);
                     /* putchar('1'); */
                 }
             }
@@ -126,6 +122,9 @@ elementary(unsigned short rule, const char *strip)
 
             for (short k = -1; k <= 1; ++k)
                 cnt = cnt << 1 | uni[((long)j + k + length) % length][flag];
+
+            /* for (short k = -1; k <= 1; ++k) */
+            /*     cnt = cnt << 1 | uni[((long)j + k + length) % length][flag]; */
 
             uni[j][!flag] = 1 & rule >> cnt;
         }

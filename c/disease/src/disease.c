@@ -16,10 +16,10 @@ static const short DIRS[4][2] = {
     { 0,  1}
 };
 
-static char *COLORS[3] = {
-    "237 238 240",
-    "113 170 197",
-    "016 032 041"
+static unsigned char *COLORS[3] = {
+    (unsigned char*)"237 238 240",
+    (unsigned char*)"113 170 197",
+    (unsigned char*)"016 032 041"
 };
 
 /*
@@ -93,12 +93,15 @@ disease(unsigned width, unsigned height, unsigned iter)
     unsigned tmp;
 
     for (unsigned n = 0; n < iter; ++n) {
-        printf("P3\n%u %u\n255\n", width, height);
+        if (n == (iter - 1)) {
+            printf("P6\n%i %i\n255\n", width, height);
+            /* printf("P3\n%u %u\n255\n", width, height); */
+        }
 
         for (unsigned i = 0; i < height; ++i)
             for (unsigned j = 0; j < width; ++j) {
                 if (n == (iter - 1)) {
-                    puts(COLORS[uni[i][j]]);
+                    fwrite(COLORS[uni[i][j]], sizeof(unsigned char), 3, stdout);
                 }
 
                 tmp = rand();
@@ -137,6 +140,18 @@ disease(unsigned width, unsigned height, unsigned iter)
     free(uni);
 }
 
+unsigned char* read_color(const char* name) {
+    unsigned char *rgb = malloc(3);
+
+    int r, g, b;
+    sscanf(getenv(name), "%d %d %d", &r, &g, &b);
+
+    rgb[0] = (unsigned char)r;
+    rgb[1] = (unsigned char)g;
+    rgb[2] = (unsigned char)b;
+    return rgb;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -144,16 +159,23 @@ main(int argc, char **argv)
     unsigned width  = 500;
     unsigned height = 500;
     unsigned iter   = 500;
+    /* unsigned seed   = 500; */
 
-    COLORS[0] = getenv("COLOR0");
-    COLORS[1] = getenv("COLOR1");
-    COLORS[2] = getenv("COLOR2");
+    /* unsigned char* color0 = read_color("COLOR0"); */
+    /* unsigned char* color1 = read_color("COLOR1"); */
+    /* unsigned char* color2 = read_color("COLOR2"); */
 
-    for (int arg; (arg = getopt(argc, argv, ":w:h:i:")) != -1;)
+    COLORS[0] = read_color("COLOR0");
+    COLORS[1] = read_color("COLOR1");
+    COLORS[2] = read_color("COLOR2");
+
+    for (int arg; (arg = getopt(argc, argv, ":w:h:i:r:")) != -1;)
         switch (arg) {
             case 'w': width  = convert_to_number(optarg); break;
             case 'h': height = convert_to_number(optarg); break;
             case 'i': iter   = convert_to_number(optarg); break;
+            /* case 'r': seed   = convert_to_number(optarg); break; */
+        case 'r': break;
             default :
                 usage(argv[0]);
         }
@@ -162,6 +184,8 @@ main(int argc, char **argv)
         usage(argv[0]);
 
     srand(time(NULL));
+    /* srand(seed); */
+    /* srand(1718203365); */
 
     disease(width, height, iter);
 
