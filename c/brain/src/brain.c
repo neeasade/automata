@@ -141,6 +141,7 @@ main(int argc, char **argv)
     unsigned width  = 500;
     unsigned height = 500;
     unsigned iter   = 500;
+    unsigned int seed   = 1337;
 
     COLORS[0] = getenv("COLOR0");
     COLORS[1] = getenv("COLOR1");
@@ -151,6 +152,7 @@ main(int argc, char **argv)
             case 'w': width  = convert_to_number(optarg); break;
             case 'h': height = convert_to_number(optarg); break;
             case 'i': iter   = convert_to_number(optarg); break;
+            case 'r': seed   = convert_to_number(optarg); break;
             default :
                 usage(argv[0]);
         }
@@ -158,7 +160,11 @@ main(int argc, char **argv)
     if (optind < argc)
         usage(argv[0]);
 
-    srand(time(NULL));
+    if (seed == 1337) {
+        srand(time(NULL));
+    } else {
+        srand(seed);
+    }
 
     brain(width, height, iter);
 

@@ -7,10 +7,10 @@
 #include <time.h>
 #include <unistd.h>
 
-static char *COLORS[3] = {
-    "237 238 240",
-    "113 170 197",
-    "016 032 041"
+static unsigned char *COLORS[3] = {
+    (unsigned char*) "237 238 240",
+    (unsigned char*)   "113 170 197",
+    (unsigned char*)   "016 032 041"
 };
 
 /*
@@ -90,12 +90,13 @@ life(unsigned width, unsigned height, unsigned iter)
     unsigned short cnt = 0;
 
     for (unsigned n = 0; n < iter; ++n) {
-        printf("P3\n%u %u\n255\n", width, height);
+        printf("P6\n%u %u\n255\n", width, height);
 
         for (unsigned i = 0; i < height; ++i)
             for (unsigned j = 0; j < width; ++j) {
                 if (n == (iter - 1)) {
-                    puts(COLORS[uni[i][j][flag]]);
+                    /* puts(COLORS  [uni[i][j][flag]]); */
+                    fwrite(COLORS[uni[i][j][flag]], sizeof(unsigned char), 3, stdout);
                     /* puts(COLORS[0]); */
                     /* putchar(uni[i][j][flag] + '0'); */
                 }
@@ -130,6 +131,20 @@ life(unsigned width, unsigned height, unsigned iter)
     free(uni);
 }
 
+unsigned char* read_color(const char* name) {
+    unsigned char *rgb = malloc(3);
+
+    int r, g, b;
+    sscanf(getenv(name), "%d %d %d", &r, &g, &b);
+
+    rgb[0] = (unsigned char)r;
+    rgb[1] = (unsigned char)g;
+    rgb[2] = (unsigned char)b;
+    return rgb;
+}
+
+
+
 int
 main(int argc, char **argv)
 {
@@ -137,16 +152,18 @@ main(int argc, char **argv)
     unsigned width  = 500;
     unsigned height = 500;
     unsigned iter   = 500;
+    unsigned int seed   = 1337;
 
-    COLORS[0] = getenv("COLOR0");
-    COLORS[1] = getenv("COLOR1");
-    COLORS[2] = getenv("COLOR2");
+    COLORS[0] = read_color("COLOR0");
+    COLORS[1] = read_color("COLOR1");
+    COLORS[2] = read_color("COLOR2");
 
-    for (int arg; (arg = getopt(argc, argv, ":w:h:i:")) != -1;)
+    for (int arg; (arg = getopt(argc, argv, ":w:h:i:r:")) != -1;)
         switch (arg) {
             case 'w': width  = convert_to_number(optarg); break;
             case 'h': height = convert_to_number(optarg); break;
             case 'i': iter   = convert_to_number(optarg); break;
+            case 'r': seed   = convert_to_number(optarg); break;
             default :
                 usage(argv[0]);
         }
@@ -154,7 +171,11 @@ main(int argc, char **argv)
     if (optind < argc)
         usage(argv[0]);
 
-    srand(time(NULL));
+    if (seed == 1337) {
+        srand(time(NULL));
+    } else {
+        srand(seed);
+    }
 
     life(width, height, iter);
 
