@@ -95,7 +95,6 @@ disease(unsigned width, unsigned height, unsigned iter)
     for (unsigned n = 0; n < iter; ++n) {
         if (n == (iter - 1)) {
             printf("P6\n%i %i\n255\n", width, height);
-            /* printf("P3\n%u %u\n255\n", width, height); */
         }
 
         for (unsigned i = 0; i < height; ++i)
@@ -159,11 +158,7 @@ main(int argc, char **argv)
     unsigned width  = 500;
     unsigned height = 500;
     unsigned iter   = 500;
-    /* unsigned seed   = 500; */
-
-    /* unsigned char* color0 = read_color("COLOR0"); */
-    /* unsigned char* color1 = read_color("COLOR1"); */
-    /* unsigned char* color2 = read_color("COLOR2"); */
+    unsigned int seed   = 1337;
 
     COLORS[0] = read_color("COLOR0");
     COLORS[1] = read_color("COLOR1");
@@ -174,8 +169,7 @@ main(int argc, char **argv)
             case 'w': width  = convert_to_number(optarg); break;
             case 'h': height = convert_to_number(optarg); break;
             case 'i': iter   = convert_to_number(optarg); break;
-            /* case 'r': seed   = convert_to_number(optarg); break; */
-        case 'r': break;
+            case 'r': seed   = convert_to_number(optarg); break;
             default :
                 usage(argv[0]);
         }
@@ -183,9 +177,11 @@ main(int argc, char **argv)
     if (optind < argc)
         usage(argv[0]);
 
-    srand(time(NULL));
-    /* srand(seed); */
-    /* srand(1718203365); */
+    if (seed == 1337) {
+        srand(time(NULL));
+    } else {
+        srand(seed);
+    }
 
     disease(width, height, iter);
 
